@@ -1,6 +1,7 @@
 *.class
 *.log
 .classpath
+.idea
 .project
 .settings/
 /bin/
