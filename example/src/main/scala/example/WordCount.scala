@@ -7,9 +7,9 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
 
-object SimpleApp {
+object WordCount {
   def main(args: Array[String]) {
-    val logFile = "/Users/ysong/Documents/OneDrive/workspace/wikipedia.dat" // Should be some file on your system
+    val logFile = "/Users/master/OneDrive/workspace/wikipedia.dat" // Should be some file on your system
     val conf = new SparkConf().setAppName("Simple Word Count Application")
     val sc = new SparkContext(conf)
     val logData = sc.textFile(logFile, 4).persist()
