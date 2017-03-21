@@ -44,9 +44,9 @@ class WikipediaSuite extends FunSuite with BeforeAndAfterAll {
   test("'occurrencesOfLang' should work for (specific) RDD with one element") {
     assert(initializeWikipediaRanking(), " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?")
     import WikipediaRanking._
-    val rdd = sc.parallelize(Seq(WikipediaArticle("title", "Java Jakarta")))
-    val res = (occurrencesOfLang("Java", rdd) == 1)
-    assert(res, "occurrencesOfLang given (specific) RDD with one element should equal to 1")
+    val rdd = sc.parallelize(Seq(WikipediaArticle("title", "Java Jakarta"), WikipediaArticle("title", "Java JakartaJava Java"), WikipediaArticle("title", "java Jakarta Java")))
+    val res = (occurrencesOfLang("Java", rdd) == 3)
+    assert(res, "occurrencesOfLang given (specific) RDD with one element should equal to 3")
   }
 
   test("'rankLangs' should work for RDD with two elements") {
