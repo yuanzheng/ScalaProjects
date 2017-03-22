@@ -1,14 +1,20 @@
 package wikipedia
 
+import java.util.logging.LogManager
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
-
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
 import org.apache.spark.rdd.RDD
 
 case class WikipediaArticle(title: String, text: String)
 
 object WikipediaRanking {
+
+  val log = Logger.getLogger(getClass.getName)
+  log.setLevel(Level.DEBUG)
 
   val langs = List(
     "JavaScript", "Java", "PHP", "Python", "C#", "C++", "Ruby", "CSS",
@@ -28,7 +34,7 @@ object WikipediaRanking {
   def occurrencesOfLang(lang: String, rdd: RDD[WikipediaArticle]): Int = {
 
     def seqOp(sum: Int, article: WikipediaArticle): Int = {
-      println(s"seqOp -> sum: $sum, article: $article")
+      //log.debug(s"seqOp -> sum: $sum, article: $article")
 
       var total: Int = sum
       if (article.text.split(" ").contains(lang))
@@ -38,7 +44,7 @@ object WikipediaRanking {
     }
 
     def combOp(sum: Int, each: Int): Int = {
-      println(s"combOp -> sum: $sum, each partition: $each")
+      //log.debug(s"combOp -> sum: $sum, each partition: $each")
       sum + each
     }
     rdd.aggregate(0)(seqOp, combOp)
@@ -62,7 +68,17 @@ object WikipediaRanking {
   /* Compute an inverted index of the set of articles, mapping each language
    * to the Wikipedia pages in which it occurs.
    */
-  def makeIndex(langs: List[String], rdd: RDD[WikipediaArticle]): RDD[(String, Iterable[WikipediaArticle])] = ???
+  def makeIndex(langs: List[String], rdd: RDD[WikipediaArticle]): RDD[(String, Iterable[WikipediaArticle])] = {
+
+    def indexArticle(article: WikipediaArticle): List[(String, WikipediaArticle)] = {
+      langs.flatMap(f => article.text.split(" ").contains(f) match {
+        case true => Some((f, article))
+        case false => None
+      })
+    }
+
+    rdd.flatMap(indexArticle).groupByKey()
+  }
 
   /* (2) Compute the language ranking again, but now using the inverted index. Can you notice
    *     a performance improvement?
@@ -85,16 +101,18 @@ object WikipediaRanking {
 
     /* Languages ranked according to (1) */
     val langsRanked: List[(String, Int)] = timed("Part 1: naive ranking", rankLangs(langs, wikiRdd))
+    log.info(s"Check langsRanked: $langsRanked")
 
     /* An inverted index mapping languages to wikipedia pages on which they appear */
     def index: RDD[(String, Iterable[WikipediaArticle])] = makeIndex(langs, wikiRdd)
-
+    log.info(s"Check index: ${index.collect()}")
+    /*
     /* Languages ranked according to (2), using the inverted index */
     val langsRanked2: List[(String, Int)] = timed("Part 2: ranking using inverted index", rankLangsUsingIndex(index))
 
     /* Languages ranked according to (3) */
     val langsRanked3: List[(String, Int)] = timed("Part 3: ranking using reduceByKey", rankLangsReduceByKey(langs, wikiRdd))
-
+    */
     /* Output the speed of each ranking */
     println(timing)
     sc.stop()
