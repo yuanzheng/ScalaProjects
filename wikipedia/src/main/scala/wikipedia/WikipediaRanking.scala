@@ -86,7 +86,10 @@ object WikipediaRanking {
    *   Note: this operation is long-running. It can potentially run for
    *   several seconds.
    */
-  def rankLangsUsingIndex(index: RDD[(String, Iterable[WikipediaArticle])]): List[(String, Int)] = ???
+  def rankLangsUsingIndex(index: RDD[(String, Iterable[WikipediaArticle])]): List[(String, Int)] = {
+    val result = index.mapValues(f => f.size)
+    result.sortBy(x => x._2, false).collect().toList
+  }
 
   /* (3) Use `reduceByKey` so that the computation of the index and the ranking are combined.
    *     Can you notice an improvement in performance compared to measuring *both* the computation of the index
@@ -112,7 +115,7 @@ object WikipediaRanking {
 
     /* Languages ranked according to (3) */
     val langsRanked3: List[(String, Int)] = timed("Part 3: ranking using reduceByKey", rankLangsReduceByKey(langs, wikiRdd))
-    
+
     /* Output the speed of each ranking */
     println(timing)
     sc.stop()
