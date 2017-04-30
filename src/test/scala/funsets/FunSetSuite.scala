@@ -110,5 +110,27 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("intersect contains elements in both sets") {
+    new TestSets {
+      val s4 = singletonSet(1)
+      val s = intersect(s1, s4)
+      assert(contains(s, 1), "intersect 1")
+      assert(!contains(s, 2), "not intersect 2")
+    }
+  }
+
+  test("diff contains elements in one set but not in others") {
+    new TestSets {
+      val s4 = singletonSet(1)
+      val s = diff(s1, s2)
+      assert(contains(s, 1), "diff 1")
+      assert(contains(s, 2), "diff 2")
+      assert(!contains(s, 3), "not diff 3")
+
+      val sX = diff(s1, s4)
+      assert(!contains(sX, 1), "not diff 1")
+      assert(!contains(sX, 3), "not diff 3")
+    }
+  }
 
 }
