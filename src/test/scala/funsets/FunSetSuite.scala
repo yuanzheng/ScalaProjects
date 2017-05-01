@@ -133,4 +133,14 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+
+  test("forall all bounded integers within s satisfy p") {
+    new TestSets {
+      val s4 = singletonSet(1001)
+      val s5 = singletonSet(2)
+      assert(forall(s1, a => a < 2), "all elements in s1 satisfy p")
+      assert(forall(s4, a => a < 2), "not satisfy p")
+      assert(!forall(s5, a => a < 2), "not satisfy p")
+    }
+  }
 }
