@@ -137,10 +137,26 @@ class FunSetSuite extends FunSuite {
   test("forall all bounded integers within s satisfy p") {
     new TestSets {
       val s4 = singletonSet(1001)
-      val s5 = singletonSet(2)
       assert(forall(s1, a => a < 2), "all elements in s1 satisfy p")
       assert(forall(s4, a => a < 2), "not satisfy p")
-      assert(!forall(s5, a => a < 2), "not satisfy p")
+      assert(!forall(s2, a => a < 2), "not satisfy p")
+    }
+  }
+
+  test("exists at least one integers within s satisfy p") {
+    new TestSets {
+      val s4 = singletonSet(1001)
+      val s5 = singletonSet(2)
+      assert(exists(s1, a => a < 2), "at least one elements in s1 satisfy p")
+      assert(!exists(s4, a => a < 2), "not satisfy p")
+      assert(!exists(s5, a => a < 2), "not satisfy p")
+
+      val s6 = union(s1, s3)
+      assert(exists(s1, a => a < 2), "at least one element of s1 and s3 union satisfy p")
+
+      val s7 = union(s2, s4)
+      assert(!exists(s7, a => a < 2), "None of element in s2 and s4 union satisfy p")
+
     }
   }
 }

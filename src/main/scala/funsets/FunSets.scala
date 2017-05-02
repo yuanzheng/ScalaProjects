@@ -8,16 +8,20 @@ object FunSets {
   /**
    * We represent a set by its characteristic function, i.e.
    * its `contains` predicate.
+    * Set 类型 是个函式方程
    */
   type Set = Int => Boolean
 
   /**
    * Indicates whether a set contains a given element.
+    *
+    * s 是匿名函式方程：(x: Int) => x == elem
    */
   def contains(s: Set, elem: Int): Boolean = s(elem)
 
   /**
    * Returns the set of the one given element.
+    * 生成一个 匿名函式方程 (x: Int) => x == elem
    */
     def singletonSet(elem: Int): Set = (x: Int) => x == elem
   
@@ -26,24 +30,24 @@ object FunSets {
    * Returns the union of the two given sets,
    * the sets of all elements that are in either `s` or `t`.
    */
-    def union(s: Set, t: Set): Set = (x: Int) => s(x) || t(x)
+    def union(s: Set, t: Set): Set = (x: Int) => contains(s, x) || contains(t, x)
   
   /**
    * Returns the intersection of the two given sets,
    * the set of all elements that are both in `s` and `t`.
    */
-    def intersect(s: Set, t: Set): Set = (x: Int) => s(x) && t(x)
+    def intersect(s: Set, t: Set): Set = (x: Int) => contains(s, x) && contains(t, x)
   
   /**
    * Returns the difference of the two given sets,
    * the set of all elements of `s` that are not in `t`.
    */
-    def diff(s: Set, t: Set): Set = (x: Int) => (s(x) && !t(x)) || (!s(x) && t(x))
+    def diff(s: Set, t: Set): Set = (x: Int) => (contains(s, x) && !contains(t, x)) || (!contains(s, x) && contains(t, x))
   
   /**
    * Returns the subset of `s` for which `p` holds.
    */
-    def filter(s: Set, p: Int => Boolean): Set = (x: Int) => s(x) && p(x)
+    def filter(s: Set, p: Int => Boolean): Set = (x: Int) => contains(s, x) && p(x)
   
 
   /**
@@ -69,7 +73,7 @@ object FunSets {
     *
     * the universal and existential quantifiers of first-order logic
     */
-  def exists(s: Set, p: Int => Boolean): Boolean = forall(s, x => !p(x))
+  def exists(s: Set, p: Int => Boolean): Boolean = !forall(s, x => !p(x))
   
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
