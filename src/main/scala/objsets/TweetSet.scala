@@ -150,42 +150,59 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def mostRetweeted: Tweet = {
 
-    if (!left.isEmpty) {
-      val leftMost = left.mostRetweeted
+    lazy val leftMostRetweeted = left.mostRetweeted
+    lazy val rightMostRetweeted = right.mostRetweeted
 
-      if (leftMost.retweets > elem.retweets) {
-        if (!right.isEmpty) {
-          val rightMost = right.mostRetweeted
+    if (!left.isEmpty && leftMostRetweeted.retweets > elem.retweets) {
+      if (!right.isEmpty && rightMostRetweeted.retweets > leftMostRetweeted.retweets) {
+        rightMostRetweeted
 
-          if (rightMost.retweets > leftMost.retweets)
-            rightMost
-          else
-            leftMost
-        } else {
-          leftMost
-        }
-      } else if (!right.isEmpty) {
-        val rightMost = right.mostRetweeted
-        if (rightMost.retweets > elem.retweets)
-          rightMost
-        else
-          elem
+      } else {
+        leftMostRetweeted
       }
-      else {
-        elem
-      }
-    }
-    else if (!right.isEmpty) {
-      val rightMost = right.mostRetweeted
-      if (rightMost.retweets > elem.retweets)
-        rightMost
-      else
-        elem
-    }
-    else {
+    } else if (!right.isEmpty && rightMostRetweeted.retweets > elem.retweets) {
+      rightMostRetweeted
+    } else {
       elem
     }
 
+    /*
+        if (!left.isEmpty) {
+          val leftMost = left.mostRetweeted
+
+          if (leftMost.retweets > elem.retweets) {
+            if (!right.isEmpty) {
+              val rightMost = right.mostRetweeted
+
+              if (rightMost.retweets > leftMost.retweets)
+                rightMost
+              else
+                leftMost
+            } else {
+              leftMost
+            }
+          } else if (!right.isEmpty) {
+            val rightMost = right.mostRetweeted
+            if (rightMost.retweets > elem.retweets)
+              rightMost
+            else
+              elem
+          }
+          else {
+            elem
+          }
+        }
+        else if (!right.isEmpty) {
+          val rightMost = right.mostRetweeted
+          if (rightMost.retweets > elem.retweets)
+            rightMost
+          else
+            elem
+        }
+        else {
+          elem
+        }
+    */
   }
 
   def descendingByRetweet: TweetList = {
