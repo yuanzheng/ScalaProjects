@@ -134,6 +134,13 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   def isEmpty: Boolean = false
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
+    if (p(elem))
+      right.filterAcc(p, left.filterAcc(p, acc.incl(elem)))
+    else
+      right.filterAcc(p, left.filterAcc(p, acc))
+  }
+  /*
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
     var tmp: TweetSet = new Empty
 
     if (p(elem)) {
@@ -147,6 +154,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
     tmp
   }
+  */
 
   def mostRetweeted: Tweet = {
 
@@ -220,6 +228,14 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     else if (elem.text < x.text) right.contains(x)
     else true
 
+  /** create a new tree when insert a new Tweet.
+    * The two trees share the same subtree.
+    * It's call persistent data structures.
+    * the old version of the data structure is still maintained, it doesn't go away
+    *
+    * @param x
+    * @return
+    */
   def incl(x: Tweet): TweetSet = {
     if (x.text < elem.text) new NonEmpty(elem, left.incl(x), right)
     else if (elem.text < x.text) new NonEmpty(elem, left, right.incl(x))
