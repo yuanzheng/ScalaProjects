@@ -20,6 +20,7 @@ object Huffman {
     */
   abstract class CodeTree
 
+  /** chars List is used to trace each character. easy to find the leaf which the character is located */
   case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
 
   case class Leaf(char: Char, weight: Int) extends CodeTree
@@ -201,7 +202,7 @@ object Huffman {
               case 1 => help(right, nextBit.tail)
             }
         }
-        case Leaf(c, _) => c :: help(tree, nextBit)
+        case Leaf(c, _) => c :: help(tree, nextBit) //always from root to bottom search
       }
     }
 
@@ -240,7 +241,7 @@ object Huffman {
         List[Bit]()
       else
         subTree match {
-          case Leaf(_, _) => help(tree, nextChars.tail)
+          case Leaf(_, _) => help(tree, nextChars.tail) // always start from the root
           case Fork(left, right, _, _) =>
             if( chars(left).contains(nextChars.head) )
               0 :: help(left, nextChars)
