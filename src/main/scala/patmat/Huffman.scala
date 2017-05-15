@@ -76,7 +76,30 @@ object Huffman {
     * println("integer is  : "+ theInt)
     * }
     */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    val sorted: List[Char] = chars.sortWith((x, y) => x < y)
+
+    def groupAll(current: (Char, Int), tail: List[Char]): List[(Char, Int)] = {
+      if (tail.isEmpty)
+        List(current)
+      else if (tail.head == current._1)
+        groupAll((current._1, current._2 + 1), tail.tail)
+      else {
+        List(current) ::: groupAll((tail.head, 1), tail.tail)
+      }
+    }
+
+    if (sorted.isEmpty)
+      List[(Char, Int)]()
+    else
+      groupAll((sorted.head, 1), sorted.tail)
+  }
+  /*
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    val countChars: Map[Char, Int] = chars.sortWith( _ < _).groupBy(identity).map(x => (x._1, x._2.size))
+    countChars.toList
+  }
+  */
 
   /**
     * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -85,12 +108,14 @@ object Huffman {
     * head of the list should have the smallest weight), where the weight
     * of a leaf is the frequency of the character.
     */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+    freqs.sortWith((x, y) => x._1 < y._1).map(f => Leaf(f._1, f._2))
+  }
 
   /**
     * Checks whether the list `trees` contains only one single code tree.
     */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = trees.length == 1
 
   /**
     * The parameter `trees` of this function is a list of code trees ordered
@@ -104,7 +129,17 @@ object Huffman {
     * If `trees` is a list of less than two elements, that list should be returned
     * unchanged.
     */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  def combine(trees: List[CodeTree]): List[CodeTree] = {
+    if (trees.length < 2)
+      trees
+    else {
+      val firstTwo: CodeTree = makeCodeTree(trees.head, trees.tail.head)
+
+      val merged: List[CodeTree] = (firstTwo :: trees.tail.tail).sortWith((x, y) => weight(x) < weight(y))
+
+      merged
+    }
+  }
 
   /**
     * This function will be called in the following way:
@@ -123,7 +158,12 @@ object Huffman {
     * the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
-  def until(xxx: ???, yyy: ???)(zzz: ???): ??? = ???
+  def until(singlet: List[CodeTree] => Boolean, comb: List[CodeTree] => List[CodeTree])(treeList: List[CodeTree]): List[CodeTree] = {
+    if (singlet(treeList)) // only one tree left
+      treeList
+    else
+      until(singlet, comb)(comb(treeList))
+  }
 
   /**
     * This function creates a code tree which is optimal to encode the text `chars`.
@@ -131,7 +171,12 @@ object Huffman {
     * The parameter `chars` is an arbitrary text. This function extracts the character
     * frequencies from that text and creates a code tree based on them.
     */
-  def createCodeTree(chars: List[Char]): CodeTree = ???
+  def createCodeTree(chars: List[Char]): CodeTree = {
+    val charPairs: List[(Char, Int)] = times(chars)
+    val reOrderIt: List[Leaf] = makeOrderedLeafList(charPairs)
+    val buildTree: List[CodeTree] = until(singleton, combine)(reOrderIt)
+
+  }
 
 
   // Part 3: Decoding
