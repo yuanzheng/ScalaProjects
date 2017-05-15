@@ -176,6 +176,7 @@ object Huffman {
     val reOrderIt: List[Leaf] = makeOrderedLeafList(charPairs)
     val buildTree: List[CodeTree] = until(singleton, combine)(reOrderIt)
 
+    buildTree.head
   }
 
 
