@@ -32,7 +32,6 @@ class HuffmanSuite extends FunSuite {
     val chars: List[Char] = List('s', 'a', 'a', 's', 'd', 's', 'd')
     val result: List[(Char, Int)] = times(chars)
     assert(result === List(('a',2), ('d',2), ('s',3)))
-    //println(s"chars times: $result")
   }
 
   test("string2chars(\"hello, world\")") {
