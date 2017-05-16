@@ -321,4 +321,7 @@ object Huffman {
     help(text)
 
   }
+
+  /** optimization */
+//  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = text flatMap codeBits(convert(tree))
 }
