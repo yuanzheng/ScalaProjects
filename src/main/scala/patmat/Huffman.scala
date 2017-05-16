@@ -1,6 +1,7 @@
 package patmat
 
 import common._
+import patmat.Huffman.CodeTable
 
 import scala.annotation.tailrec
 
@@ -161,6 +162,7 @@ object Huffman {
     * the example invocation. Also define the return type of the `until` function.
     *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
     */
+  @tailrec
   def until(singlet: List[CodeTree] => Boolean, comb: List[CodeTree] => List[CodeTree])(treeList: List[CodeTree]): List[CodeTree] = {
     if (singlet(treeList)) // only one tree left
       treeList
@@ -220,7 +222,7 @@ object Huffman {
 
   /**
     * What does the secret message say? Can you decode it?
-    * For the decoding use the `frenchCode' Huffman tree defined above.
+    * For the decoding use the 'frenchCode' Huffman tree defined above.
     **/
   val secret: List[Bit] = List(0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1)
 
@@ -281,14 +283,23 @@ object Huffman {
     * a valid code tree that can be represented as a code table. Using the code tables of the
     * sub-trees, think of how to build the code table for the entire tree.
     */
-  def convert(tree: CodeTree): CodeTable = ???
+  def convert(tree: CodeTree): CodeTable = {
+    tree match {
+      case Fork(left, right, _, _) => mergeCodeTables(convert(left), convert(right))
+      case Leaf(char, _) => List((char, List[Bit]()))
+    }
+
+  }
 
   /**
     * This function takes two code tables and merges them into one. Depending on how you
     * use it in the `convert` method above, this merge method might also do some transformations
     * on the two parameter code tables.
     */
-  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = ???
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
+    def prepend(b: Bit)(code: (Char, List[Bit])): (Char, List[Bit]) = (code._1, b :: code._2)
+    a.map(prepend(0)) ::: b.map(prepend(1))
+  }
 
   /**
     * This function encodes `text` according to the code tree `tree`.
@@ -296,5 +307,18 @@ object Huffman {
     * To speed up the encoding process, it first converts the code tree to a code table
     * and then uses it to perform the actual encoding.
     */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    val table: CodeTable = convert(tree)
+
+    def help(next: List[Char]): List[Bit] = {
+
+      if (next isEmpty)
+        List[Bit]()
+      else
+        codeBits(table)(next.head) ::: help(next.tail)
+    }
+
+    help(text)
+
+  }
 }

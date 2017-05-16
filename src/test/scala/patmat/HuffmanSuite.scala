@@ -77,4 +77,14 @@ class HuffmanSuite extends FunSuite {
 
   }
 
+  test("convert test") {
+    val input = "ABCDEFGH"
+    val tree: CodeTree = createCodeTree(input.toList)
+
+    val result = convert(tree)
+    val bits: List[Bit] = quickEncode(tree)(List('C', 'G', 'H'))
+
+    assert(bits === List(0,0,0,1,0,0,1,0,1))
+  }
+
 }
