@@ -68,4 +68,13 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
+  test("codeBits gets List Bit") {
+    assert(codeBits(List())('a') == List[Bit]() )
+
+    assert(codeBits(List(('a', List[Bit](2,4,1))))('a') == List[Bit](2,4,1) )
+
+    assert(codeBits(List(('a', List[Bit](2,4,1))))('x') == List[Bit]() )
+
+  }
+
 }

@@ -2,6 +2,8 @@ package patmat
 
 import common._
 
+import scala.annotation.tailrec
+
 /**
   * Assignment 4: Huffman coding
   *
@@ -261,8 +263,16 @@ object Huffman {
     * This function returns the bit sequence that represents the character `char` in
     * the code table `table`.
     */
-  def codeBits(table: CodeTable)(char: Char): List[Bit] = ???
+  @tailrec
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = {
+    if (table.isEmpty)
+      List[Bit]()
+    else if (table.head._1 == char)
+      table.head._2
+    else
+      codeBits(table.tail)(char)
 
+  }
   /**
     * Given a code tree, create a code table which contains, for every character in the
     * code tree, the sequence of bits representing that character.
