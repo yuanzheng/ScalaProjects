@@ -98,6 +98,7 @@ object Huffman {
     else
       groupAll((sorted.head, 1), sorted.tail)
   }
+
   /*
   def times(chars: List[Char]): List[(Char, Int)] = {
     val countChars: Map[Char, Int] = chars.sortWith( _ < _).groupBy(identity).map(x => (x._1, x._2.size))
@@ -144,6 +145,14 @@ object Huffman {
       merged
     }
   }
+
+  /** optimal */
+  /*
+  def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
+    case left :: right :: tail => new Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right)) :: combine(tail)
+    case _ => trees
+  }
+  */
 
   /**
     * This function will be called in the following way:
@@ -213,6 +222,19 @@ object Huffman {
     help(tree, bits)
   }
 
+  /** optimal */
+  /*
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+    def traverse(remaining: CodeTree, bits: List[Bit]): List[Char] = remaining match {
+      case Leaf(c, _) if bits.isEmpty => List(c)
+      case Leaf(c, _) => c :: traverse(tree, bits)
+      case Fork(left, right, _, _) if bits.head == 0 => traverse(left, bits.tail)
+      case Fork(left, right, _, _) => traverse(right, bits.tail)
+    }
+
+    traverse(tree, bits)
+  }
+  */
   /**
     * A Huffman coding tree for the French language.
     * Generated from the data given at
@@ -241,13 +263,13 @@ object Huffman {
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
 
     def help(subTree: CodeTree, nextChars: List[Char]): List[Bit] = {
-      if( nextChars.isEmpty )
+      if (nextChars.isEmpty)
         List[Bit]()
       else
         subTree match {
           case Leaf(_, _) => help(tree, nextChars.tail) // always start from the root
           case Fork(left, right, _, _) =>
-            if( chars(left).contains(nextChars.head) )
+            if (chars(left).contains(nextChars.head))
               0 :: help(left, nextChars)
             else
               1 :: help(right, nextChars)
@@ -256,6 +278,19 @@ object Huffman {
 
     help(tree, text)
   }
+
+  /** optimal */
+  /*
+  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    def lookup(tree:  CodeTree)(c: Char): List[Bit] = tree match {
+      case Leaf(_, _) => List()
+      case Fork(left, right, _, _) if chars(left).contains(c) => 0 :: lookup(left)(c)
+      case Fork(left, right, _, _) => 1 :: lookup(right)(c)
+    }
+
+    text flatMap lookup(tree)
+  }
+  */
 
   // Part 4b: Encoding using code table
 
@@ -275,6 +310,14 @@ object Huffman {
       codeBits(table.tail)(char)
 
   }
+
+  /** optimal */
+  /*
+  def codeBits(table: CodeTable)(char: Char): List[Bit] = {
+    table.filter( (code) => code._1 == char ).head._2
+  }
+  */
+
   /**
     * Given a code tree, create a code table which contains, for every character in the
     * code tree, the sequence of bits representing that character.
@@ -298,6 +341,7 @@ object Huffman {
     */
   def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = {
     def prepend(b: Bit)(code: (Char, List[Bit])): (Char, List[Bit]) = (code._1, b :: code._2)
+
     a.map(prepend(0)) ::: b.map(prepend(1))
   }
 
@@ -323,5 +367,5 @@ object Huffman {
   }
 
   /** optimization */
-//  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = text flatMap codeBits(convert(tree))
+  //  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = text flatMap codeBits(convert(tree))
 }
