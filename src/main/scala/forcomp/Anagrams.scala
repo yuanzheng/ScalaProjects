@@ -1,6 +1,6 @@
 package forcomp
 
-
+import scala.collection.immutable._
 object Anagrams {
 
   /** A word is simply a `String`. */
@@ -118,8 +118,8 @@ object Anagrams {
    *  and has no zero-entries.
    */
   def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+
     def helper(occur: Occurrences, each: (Char, Int)): Occurrences = {
-      println(s"each time: $occur and $each")
       for ((letter, count) <- occur) yield {
         if (letter == each._1)
           (letter, count - each._2)
@@ -127,11 +127,17 @@ object Anagrams {
           (letter, count)
       }
     }
-    val result = (x foldLeft y)(helper)
-
-    println(s"result: $result")
+    val result = (y foldLeft x)(helper)
 
     result.filter(x => x._2>0).sorted
+
+    /*
+    (y foldLeft SortedMap[Char,Int]() ++ x){ case (map, (ch, tm)) => {
+      val newTm = map(ch) - tm
+      if (newTm != 0) map updated (ch, newTm)
+      else map - ch
+    } }.toList
+    */
   }
 
 
@@ -175,5 +181,25 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+
+    def helper(occur :Occurrences): List[Sentence] = occur match {
+      case head::tail => {
+
+        for {
+          comb <- combinations(occur)
+          word <- dictionaryByOccurrences getOrElse(comb, Nil)
+          sentence <- helper(subtract(occur, comb))
+
+          if !comb.isEmpty
+        } yield word :: sentence
+        
+
+      }
+      case Nil => List(Nil)
+    }
+
+    helper(sentenceOccurrences(sentence))
+
+  }
 }
