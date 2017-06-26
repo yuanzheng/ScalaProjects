@@ -18,6 +18,7 @@ class BloxorzSuite extends FunSuite {
      */
     def solve(ls: List[Move]): Block =
       ls.foldLeft(startBlock) { case (block, move) =>
+        //println(s"Check block: $block")
         require(block.isLegal) // The solution must always lead to legal blocks
         move match {
           case Left => block.left
@@ -41,7 +42,6 @@ class BloxorzSuite extends FunSuite {
 
     val optsolution = List(Right, Right, Down, Right, Right, Right, Down)
   }
-
 
 	test("terrain function level 1") {
     new Level1 {
@@ -67,10 +67,11 @@ class BloxorzSuite extends FunSuite {
 
 	test("optimal solution for level 1") {
     new Level1 {
+      //println(s"what is solution: $solution")
+      //println(s"what is goal: $goal")
       assert(solve(solution) == Block(goal, goal))
     }
   }
-
 
 	test("optimal solution length for level 1") {
     new Level1 {
