@@ -1,7 +1,7 @@
 # Functional Programming in Scala Specialization
 This repository is only for assignments of Scala courses on Coursera taught by Martin Odersky.
 
-Solutions are on each specific branch.
+Solutions are on each specific branch. (代码在各自的branch中)
 
 ## Functional Programming Principles in Scala
 1. Recursion
